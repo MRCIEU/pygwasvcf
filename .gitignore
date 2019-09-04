@@ -1,0 +1,5 @@
+pygwasvcftools/venv/
+pygwasvcftools/.idea/
+pygwasvcftools/__pycache__/
+.vscode/
+*.pyc
