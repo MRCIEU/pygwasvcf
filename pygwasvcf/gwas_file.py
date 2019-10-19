@@ -6,7 +6,7 @@ import logging
 
 class GwasFile:
     # TODO
-    BCFTOOLS_BIN = "/Users/ml/GitLab/pygwasvcftools/pygwasvcftools/bcftools-1.9/bcftools"
+    BCFTOOLS_BIN = "/Users/ml/GitLab/pygwasvcf/pygwasvcf/bcftools-1.9/bcftools"
 
     def __init__(self, file_path, genome_path):
         self.file_path = file_path
