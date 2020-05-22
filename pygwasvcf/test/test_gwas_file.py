@@ -4,7 +4,7 @@ import os
 import sqlite3
 import pytest
 
-FILE = "data/case.control.example.vcf.gz"
+FILE = os.path.join(os.path.dirname(__file__), "data", "case.control.example.vcf.gz")
 
 
 def test_get_sample_metadata():

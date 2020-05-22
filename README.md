@@ -12,6 +12,10 @@ The package provides a thin wrapper around [pysam](https://pysam.readthedocs.io/
 pip install git+https://github.com/mrcieu/pygwasvcf
 ```
 
+## GWAS-VCF files
+
+Download over 10,000 GWAS-VCF files from the [IEU GWAS database](https://gwas.mrcieu.ac.uk/)
+
 ## Examples
 
 Read GWAS trait/study metadata
@@ -70,7 +74,3 @@ for variant in g.query(chrom="1", start=1, end=1):
 # always close when done to release resources
 g.close()
 ```
-
-## GWAS-VCF files
-
-Download over 10,000 GWAS-VCF files from the [IEU GWAS database](https://gwas.mrcieu.ac.uk/)
