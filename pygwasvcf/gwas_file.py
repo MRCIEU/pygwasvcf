@@ -1,70 +1,53 @@
-import subprocess
 from pysam import VariantFile
-import numpy as np
-import logging
 
 
 class GwasFile:
-    # TODO
-    BCFTOOLS_BIN = "/Users/ml/GitLab/pygwasvcf/pygwasvcf/bcftools-1.9/bcftools"
+    def __init__(self, file_path, rsidx_path=None):
+        self.vcf = VariantFile(file_path)
+        self.rsidx_path = rsidx_path
 
-    def __init__(self, file_path, genome_path):
-        self.file_path = file_path
-        self.genome_path = genome_path
+    def close(self):
+        """Close GWAS-VCF file handle"""
+        self.vcf.close()
 
-    def read(self, chrom=None, start=None, end=None, variant_id=None, studies_to_include=None, exclude_filtered=True,
-             pval_threshold=None):
+    def get_sample_metadata(self):
+        """Extract metadata about the GWAS trait"""
+        res = []
+        for rec in self.vcf.header.records:
+            if rec.type == "SAMPLE":
+                res.append(rec)
+        return res
 
-        view_args = [
-            GwasFile.BCFTOOLS_BIN,
-            "view",
-            "-O",
-            "u"
-        ]
+    @staticmethod
+    def parse(rec):
+        """Helper function to extract GWAS related variables from the VCF record"""
+        return rec
 
-        if exclude_filtered:
-            view_args.append("-i")
-            view_args.append("'FILTER=PASS'")
+    def get_location_for_rsid(self, rsid):
+        """Helper function to convert rsID to chromosome and position using [rsidx](https://github.com/bioforensics/rsidx)"""
+        if self.rsidx_path is None:
+            raise ValueError("Cannot query by variant identifier without providing an rsidx")
+        return None, None, None
 
-        if chrom is not None:
-            if start is None:
-                view_args.append("-r")
-                view_args.append("{}".format(chrom))
-            elif end is None:
-                view_args.append("-r")
-                view_args.append("{}:{}".format(chrom, start))
-            else:
-                view_args.append("-r")
-                view_args.append("{}:{}-{}".format(chrom, start, end))
-
-        if studies_to_include is not None:
-            view_args.append("-s")
-            view_args.append(",".join(studies_to_include))
-
-        if pval_threshold is not None:
-            view_args.append("-i")
-            view_args.append("'FORMAT/LP > {}'".format(-np.log10(pval_threshold)))
+    def query(self, chrom=None, start=None, end=None, variant_id=None, studies_to_include=None, exclude_filtered=True,
+              pval_threshold=None):
+        """Variant-trait association query function"""
 
         if variant_id is not None:
-            view_args.append("-i")
-            view_args.append("'ID={}'".format(variant_id))
+            if chrom is not None or start is not None or end is not None:
+                raise ValueError("Cannot provide chromosome, start or end with variant ID. Choose one query.")
+            chrom, start, end = self.get_location_for_rsid(variant_id)
+        else:
+            if chrom is None or start is None or end is None:
+                raise ValueError(
+                    "You must provide a genomic location range or variant identifier to perform the query.")
 
-        view_args.append(self.file_path)
+        # extract variant(s) from GWAS-VCF
+        for rec in self.vcf.fetch(chrom, start, end):
 
-        norm_args = [
-            GwasFile.BCFTOOLS_BIN,
-            "norm",
-            "-c", "e",
-            "-f", self.genome_path,
-            "-m", "-any",
-            "-O", "u"
-        ]
+            # skip variants not meeting filter requirements
+            if exclude_filtered and rec.filter != "PASS":
+                continue
 
-        logging.debug("bcftool cmd: {}".format(view_args))
-        logging.debug("bcftool cmd: {}".format(norm_args))
-
-        # execute bcftools command and parse with pysam
-        # TODO use tmp file?
-        with subprocess.Popen(view_args, stdout=subprocess.PIPE) as view_proc:
-            with subprocess.Popen(norm_args, stdout=subprocess.PIPE, stdin=view_proc.stdout) as norm_proc:
-                return VariantFile(norm_proc.stdout)
+            # lazy return parsed record
+            yield GwasFile.parse(rec)
