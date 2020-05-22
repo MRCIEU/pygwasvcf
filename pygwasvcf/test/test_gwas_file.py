@@ -25,7 +25,7 @@ def test_get_sample_metadata():
 def test_format_variant_record_for_rsidx():
     vcf = pysam.VariantFile(FILE)
     for rec in vcf.fetch():
-        for chrom, pos, rsid in GwasVcf.format_variant_record_for_rsidx(rec):
+        for rsid, chrom, pos in GwasVcf.format_variant_record_for_rsidx(rec):
             assert chrom is not None
             assert isinstance(chrom, str)
             assert pos is not None
@@ -64,6 +64,12 @@ def test_get_location_from_rsid():
     assert chrom == "1"
     assert start == 49298
     assert end == 49298
+    g = GwasVcf(FILE, rsidx_path=FILE + ".rsidx")
+    chrom, start, end = g.get_location_from_rsid("rs10399793")
+    g.close()
+    assert chrom == "1"
+    assert start == 49298
+    assert end == 49298
 
 
 def check_first_row(row):
@@ -74,15 +80,10 @@ def check_first_row(row):
 
 def test_query():
     g = GwasVcf(FILE)
+    g.index_rsid()
     for num, row in enumerate(g.query(chrom="1", start=49298, end=49298)):
         assert num == 1
         check_first_row(row)
-    with pytest.raises(SyntaxError):
-        g.query(chrom="1", start=49298, end=49298, variant_id="test")
-    with pytest.raises(SyntaxError):
-        g.query(chrom="1", start=49298)
-    with pytest.raises(SyntaxError):
-        g.query(chrom="1", start=49298)
     for num, row in enumerate(g.query(variant_id="rs10399793")):
         assert num == 1
         check_first_row(row)

@@ -15,5 +15,14 @@ class VariantRecordGwas(VariantRecord):
         else:
             return VariantRecordGwas.transform_pval(p)
 
+    def get_se(self, trait):
+        return (self.samples[trait]['SE'][0])
+
+    def get_beta(self, trait):
+        return (self.samples[trait]['ES'][0])
+
+    def get_af(self, trait):
+        return (self.samples[trait]['AF'][0])
+
     def check_biallelic(self):
         assert len(self.alts) == 1

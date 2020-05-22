@@ -100,33 +100,24 @@ class GwasVcf:
             res = cur.fetchone()
         return res[0], res[1], res[1]
 
-    def query(self, chrom=None, start=None, end=None, variant_id=None, traits_to_include=None, exclude_filtered=True,
-              pval_threshold=None):
+    def query(self, chrom=None, start=None, end=None, variant_id=None, exclude_filtered=True):
         """
         Variant-trait association query function
         :param chrom: Chromosome to query
         :param start: Start position of interval (1-based)
         :param end: End position of interval (1-based)
         :param variant_id: rsID to query using [rsidx](https://github.com/bioforensics/rsidx)
-        :param traits_to_include: Optional list of traits to return in the result
         :param exclude_filtered: Boolean flag to remove record that do not meet QC
-        :param pval_threshold: Optional P value threshold for filtering the results
         :return: rec: VariantRecordGwas object containing chromosome, position, alleles, association statistics
         """
         if variant_id is None:
-            if (chrom is None) or (start is None) or (end is None):
-                raise SyntaxError(
+            if chrom is None or start is None or end is None:
+                raise ValueError(
                     "You must provide a genomic location range or variant identifier to perform the query.")
         else:
-            if (chrom is not None) or (start is not None) or (end is not None):
-                raise SyntaxError("Cannot provide chromosome, start or end with variant ID. Choose one query.")
+            if chrom is not None or start is not None or end is not None:
+                raise ValueError("Cannot provide chromosome, start or end with variant ID. Choose one query.")
             chrom, start, end = self.get_location_from_rsid(variant_id)
-
-        if pval_threshold is not None and not isinstance(pval_threshold, float):
-            raise SyntaxError("You must provide a valid float to filter by P value")
-
-        if traits_to_include is not None and not isinstance(traits_to_include, str):
-            raise SyntaxError("You must provide a valid float to filter by P value")
 
         # extract variant(s) from GWAS-VCF
         for rec in self.vcf.fetch(chrom, start, end):
