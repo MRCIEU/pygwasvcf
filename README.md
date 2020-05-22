@@ -8,13 +8,9 @@ The package provides a thin wrapper around [pysam](https://pysam.readthedocs.io/
 pip install git+https://github.com/mrcieu/pygwasvcf
 ```
 
-## Preparing [rsidx](https://github.com/bioforensics/rsidx)
-
-TODO
-
 ## Example
 
 ```python
-from pygwasvcf.gwas_file import GwasFile
+from pygwasvcf.gwas_vcf import GwasVcf
 # TODO
 ```
