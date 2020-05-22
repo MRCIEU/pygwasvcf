@@ -1,6 +1,10 @@
 # GWAS-VCF Python parser
 
-The package provides a thin wrapper around [pysam](https://pysam.readthedocs.io/en/latest/index.html) to support extraction of GWAS metadata.
+<!-- badges: start -->
+[![Build Status](https://travis-ci.org/MRCIEU/pygwasvcf.svg?branch=master)](https://travis-ci.org/MRCIEU/pygwasvcf)
+<!-- badges: end -->
+
+The package provides a thin wrapper around [pysam](https://pysam.readthedocs.io/en/latest/index.html) and [rsidx](https://github.com/bioforensics/rsidx) to support extraction of GWAS metadata.
 
 ## Install
 
