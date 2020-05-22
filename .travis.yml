@@ -4,4 +4,5 @@ python:
 install:
   - pip install -r pygwasvcf/requirements.txt
 script:
-  - python -m pytest -v pygwasvcf/test
+  - cd pygwasvcf
+  - python -m pytest -v test
