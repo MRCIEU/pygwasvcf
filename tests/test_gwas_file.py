@@ -1,4 +1,4 @@
-from gwas_vcf import GwasVcf
+import pygwasvcf
 import pysam
 import os
 import sqlite3
@@ -8,7 +8,7 @@ FILE = os.path.join(os.path.dirname(__file__), "data", "case.control.example.vcf
 
 
 def test_get_sample_metadata():
-    g = GwasVcf(FILE)
+    g = pygwasvcf.GwasVcf(FILE)
     recs = g.get_sample_metadata()
     assert "UKB-b:13008" in recs
     assert "TotalVariants" in recs["UKB-b:13008"]
@@ -25,7 +25,7 @@ def test_get_sample_metadata():
 def test_format_variant_record_for_rsidx():
     vcf = pysam.VariantFile(FILE)
     for rec in vcf.fetch():
-        for rsid, chrom, pos in GwasVcf.format_variant_record_for_rsidx(rec):
+        for rsid, chrom, pos in pygwasvcf.GwasVcf.format_variant_record_for_rsidx(rec):
             assert chrom is not None
             assert isinstance(chrom, str)
             assert pos is not None
@@ -37,7 +37,7 @@ def test_format_variant_record_for_rsidx():
 
 def test_index_rsid():
     # index GWAS-VCF using rsidx
-    g = GwasVcf(FILE)
+    g = pygwasvcf.GwasVcf(FILE)
     g.index_rsid()
     g.close()
     # check index exists
@@ -57,14 +57,14 @@ def test_index_rsid():
 
 
 def test_get_location_from_rsid():
-    g = GwasVcf(FILE)
+    g = pygwasvcf.GwasVcf(FILE)
     g.index_rsid()
     chrom, start, end = g.get_location_from_rsid("rs10399793")
     g.close()
     assert chrom == "1"
     assert start == 49298
     assert end == 49298
-    g = GwasVcf(FILE, rsidx_path=FILE + ".rsidx")
+    g = pygwasvcf.GwasVcf(FILE, rsidx_path=FILE + ".rsidx")
     chrom, start, end = g.get_location_from_rsid("rs10399793")
     g.close()
     assert chrom == "1"
@@ -79,7 +79,7 @@ def check_first_row(row):
 
 
 def test_query():
-    g = GwasVcf(FILE)
+    g = pygwasvcf.GwasVcf(FILE)
     g.index_rsid()
     for num, row in enumerate(g.query(chrom="1", start=49298, end=49298)):
         assert num == 1

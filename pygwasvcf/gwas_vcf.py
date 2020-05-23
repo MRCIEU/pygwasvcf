@@ -1,5 +1,5 @@
 from pysam import VariantFile
-from variant_record_gwas import VariantRecordGwas
+import pygwasvcf
 import sqlite3
 import os
 
@@ -122,7 +122,7 @@ class GwasVcf:
         # extract variant(s) from GWAS-VCF
         for rec in self.vcf.fetch(chrom, start, end):
             # Extend to VariantRecord to provide useful funcs for GWAS assoc
-            rec.__class__ = VariantRecordGwas
+            rec.__class__ = pygwasvcf.VariantRecordGwas
             rec.check_biallelic()
 
             # skip variants not meeting filter requirements
