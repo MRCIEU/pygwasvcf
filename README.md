@@ -12,11 +12,11 @@ The package provides a thin wrapper around [pysam](https://pysam.readthedocs.io/
 pip install git+https://github.com/mrcieu/pygwasvcf
 ```
 
-## GWAS-VCF files
+## Summary statistics in GWAS-VCF
 
 Download over 10,000 GWAS-VCF files contain full summary statistics from the [IEU GWAS database](https://gwas.mrcieu.ac.uk/)
 
-## Examples
+## Parser examples
 
 Read GWAS trait/study metadata
 
@@ -54,7 +54,7 @@ g = pygwasvcf.GwasVcf("/path/to/gwas.vcf.gz")
 # index on dbSNP identifier
 # based on [rsidx](https://github.com/bioforensics/rsidx)
 # only need to do this once and then provide the index path to the constructor
-# i.e. GwasVcf("/path/to/gwasvcf.vcf.gz", rsidx_path="/path/to/gwasvcf.vcf.gz.rsidx")
+# i.e. GwasVcf("/path/to/gwas.vcf.gz", rsidx_path="/path/to/gwas.vcf.gz.rsidx")
 g.index_rsid()
 
 # rapid query by rsID  
