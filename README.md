@@ -4,7 +4,7 @@
 [![Build Status](https://travis-ci.org/MRCIEU/pygwasvcf.svg?branch=master)](https://travis-ci.org/MRCIEU/pygwasvcf)
 <!-- badges: end -->
 
-The package provides a thin wrapper around [pysam](https://pysam.readthedocs.io/en/latest/index.html) and [rsidx](https://github.com/bioforensics/rsidx) to support extraction of GWAS metadata.
+The package provides a thin wrapper around [pysam](https://pysam.readthedocs.io/en/latest/index.html) and [rsidx](https://github.com/bioforensics/rsidx) to parse VCF files containing GWAS summary statistics and trait metadata.
 
 ## Install
 
@@ -14,7 +14,7 @@ pip install git+https://github.com/mrcieu/pygwasvcf
 
 ## GWAS-VCF files
 
-Download over 10,000 GWAS-VCF files from the [IEU GWAS database](https://gwas.mrcieu.ac.uk/)
+Download over 10,000 GWAS-VCF files contain full summary statistics from the [IEU GWAS database](https://gwas.mrcieu.ac.uk/)
 
 ## Examples
 
@@ -22,7 +22,7 @@ Read GWAS trait/study metadata
 
 ```python
 from pygwasvcf.gwas_vcf import GwasVcf
-g = GwasVcf("/path/to/gwasvcf.vcf.gz")
+g = GwasVcf("/path/to/gwas.vcf.gz")
 
 # print dictionary of GWAS metadata
 print(g.get_sample_metadata())
@@ -31,15 +31,25 @@ print(g.get_sample_metadata())
 g.close()
 ```
 
-Query variant-trait association(s) by genomic location
+Query variant-trait association(s) by chromosome and position location
 
 ```python
 from pygwasvcf.gwas_vcf import GwasVcf
-g = GwasVcf("/path/to/gwasvcf.vcf.gz")
+g = GwasVcf("/path/to/gwas.vcf.gz")
 
 # query by chromosome and position interval
 for variant in g.query(chrom="1", start=1, end=1):
     print(variant)
+
+# always close when done to release resources
+g.close()
+```
+
+Query variant-trait association(s) by dbSNP rsID
+
+```python
+from pygwasvcf.gwas_vcf import GwasVcf
+g = GwasVcf("/path/to/gwas.vcf.gz")
 
 # index on dbSNP identifier
 # based on [rsidx](https://github.com/bioforensics/rsidx)
@@ -55,11 +65,11 @@ for variant in g.query(variant_id="rs1245"):
 g.close()
 ```
 
-Extract summary statistics for variant
+Extract summary statistics from a variant object
 
 ```python
 from pygwasvcf.gwas_vcf import GwasVcf
-g = GwasVcf("/path/to/gwasvcf.vcf.gz")
+g = GwasVcf("/path/to/gwas.vcf.gz")
 
 # query by chromosome and position interval
 for variant in g.query(chrom="1", start=1, end=1):
