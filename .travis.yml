@@ -1,8 +1,7 @@
 language: python
 python:
-  - "3.8"
+  - "3.6"
 install:
-  - pip install -r pygwasvcf/requirements.txt
+  - pip install .
 script:
-  - cd pygwasvcf
-  - python -m pytest -v test
+  - python -m pytest -v tests

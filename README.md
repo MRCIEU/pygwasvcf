@@ -21,8 +21,8 @@ Download over 10,000 GWAS-VCF files contain full summary statistics from the [IE
 Read GWAS trait/study metadata
 
 ```python
-from pygwasvcf.gwas_vcf import GwasVcf
-g = GwasVcf("/path/to/gwas.vcf.gz")
+import pygwasvcf
+g = pygwasvcf.GwasVcf("/path/to/gwas.vcf.gz")
 
 # print dictionary of GWAS metadata
 print(g.get_sample_metadata())
@@ -34,8 +34,8 @@ g.close()
 Query variant-trait association(s) by chromosome and position location
 
 ```python
-from pygwasvcf.gwas_vcf import GwasVcf
-g = GwasVcf("/path/to/gwas.vcf.gz")
+import pygwasvcf
+g = pygwasvcf.GwasVcf("/path/to/gwas.vcf.gz")
 
 # query by chromosome and position interval
 for variant in g.query(chrom="1", start=1, end=1):
@@ -48,8 +48,8 @@ g.close()
 Query variant-trait association(s) by dbSNP rsID
 
 ```python
-from pygwasvcf.gwas_vcf import GwasVcf
-g = GwasVcf("/path/to/gwas.vcf.gz")
+import pygwasvcf
+g = pygwasvcf.GwasVcf("/path/to/gwas.vcf.gz")
 
 # index on dbSNP identifier
 # based on [rsidx](https://github.com/bioforensics/rsidx)
@@ -68,8 +68,8 @@ g.close()
 Extract summary statistics from a variant object
 
 ```python
-from pygwasvcf.gwas_vcf import GwasVcf
-g = GwasVcf("/path/to/gwas.vcf.gz")
+import pygwasvcf
+g = pygwasvcf.GwasVcf("/path/to/gwas.vcf.gz")
 
 # query by chromosome and position interval
 for variant in g.query(chrom="1", start=1, end=1):
