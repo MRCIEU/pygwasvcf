@@ -14,15 +14,26 @@ class GwasVcf:
         :param file_path: Path to GWAS-VCF
         :param rsidx_path: Path to RSIDX (optional)
         """
-        self.file_path = file_path
-        self.vcf = VariantFile(file_path)
-        self.rsidx_path = rsidx_path
+        self.__file_path = file_path
+        self.__rsidx_path = rsidx_path
+        self.__vcf = None
 
-    def close(self):
+    def __enter__(self):
+        """
+        Open VariantFile using with resources
+        """
+        self.__vcf = VariantFile(self.__file_path)
+        return self
+
+    def __exit__(self, type, value, traceback):
         """
         Close GWAS-VCF file handle
         """
-        self.vcf.close()
+        self.__vcf.close()
+        self.__vcf = None
+
+    def is_closed(self):
+        return self.__vcf is None
 
     @staticmethod
     def format_variant_record_for_rsidx(rec):
@@ -44,7 +55,10 @@ class GwasVcf:
         """
         Index GWAS-VCF using rsID and pysam adapted from [rsidx](https://github.com/bioforensics/rsidx)
         """
-        idx_path = self.file_path + ".rsidx"
+        if self.__vcf is None:
+            raise ValueError("Cannot use methods on the VCF object before the file is open.")
+
+        idx_path = self.__file_path + ".rsidx"
         if os.path.exists(idx_path):
             os.remove(idx_path)
 
@@ -60,20 +74,22 @@ class GwasVcf:
             dbconn.commit()
 
             # add variant records to SQLite DB
-            for rec in self.vcf.fetch():
+            for rec in self.__vcf.fetch():
                 c.executemany('INSERT OR IGNORE INTO rsid_to_coord VALUES (?,?,?)',
                               GwasVcf.format_variant_record_for_rsidx(rec))
                 dbconn.commit()
 
-        self.rsidx_path = idx_path
+        self.__rsidx_path = idx_path
 
     def get_sample_metadata(self):
         """
         Extract metadata about the GWAS trait
         :return: res: Dict of Dict containing a key=value pairs for each trait in the GWAS-VCF
         """
+        if self.__vcf is None:
+            raise ValueError("Cannot use methods on the VCF object before the file is open.")
         res = dict()
-        for rec in self.vcf.header.records:
+        for rec in self.__vcf.header.records:
             if rec.key == "SAMPLE":
                 res[rec['ID']] = dict()
                 for k in rec:
@@ -91,10 +107,10 @@ class GwasVcf:
         """
         if not rsid.startswith("rs"):
             raise ValueError("Variant ID query must be an rsID")
-        if self.rsidx_path is None:
+        if self.__rsidx_path is None:
             raise ValueError("Cannot query by variant identifier without providing an rsidx")
         q = (int(rsid[2:]),)
-        with sqlite3.connect(self.rsidx_path) as dbconn:
+        with sqlite3.connect(self.__rsidx_path) as dbconn:
             cur = dbconn.cursor()
             cur.execute('SELECT DISTINCT chrom,coord FROM rsid_to_coord WHERE rsid =?', q)
             res = cur.fetchone()
@@ -110,6 +126,8 @@ class GwasVcf:
         :param exclude_filtered: Boolean flag to remove record that do not meet QC
         :return: rec: VariantRecordGwas object containing chromosome, position, alleles, association statistics
         """
+        if self.__vcf is None:
+            raise ValueError("Cannot use methods on the VCF object before the file is open.")
         if variant_id is None:
             if chrom is None or start is None or end is None:
                 raise ValueError(
@@ -120,7 +138,7 @@ class GwasVcf:
             chrom, start, end = self.get_location_from_rsid(variant_id)
 
         # extract variant(s) from GWAS-VCF
-        for rec in self.vcf.fetch(chrom, start, end):
+        for rec in self.__vcf.fetch(chrom, start, end):
             # Extend to VariantRecord to provide useful funcs for GWAS assoc
             rec.__class__ = pygwasvcf.VariantRecordGwas
             rec.check_biallelic()

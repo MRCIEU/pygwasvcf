@@ -7,19 +7,26 @@ import pytest
 FILE = os.path.join(os.path.dirname(__file__), "data", "case.control.example.vcf.gz")
 
 
-def test_get_sample_metadata():
+def test_close():
+    with pygwasvcf.GwasVcf(FILE) as g:
+        assert not g.is_closed()
+    assert g.is_closed()
     g = pygwasvcf.GwasVcf(FILE)
-    recs = g.get_sample_metadata()
-    assert "UKB-b:13008" in recs
-    assert "TotalVariants" in recs["UKB-b:13008"]
-    assert "VariantsNotRead" in recs["UKB-b:13008"]
-    assert "HarmonisedVariants" in recs["UKB-b:13008"]
-    assert "VariantsNotHarmonised" in recs["UKB-b:13008"]
-    assert "SwitchedAlleles" in recs["UKB-b:13008"]
-    assert "TotalControls" in recs["UKB-b:13008"]
-    assert "TotalCases" in recs["UKB-b:13008"]
-    assert "StudyType" in recs["UKB-b:13008"]
-    g.close()
+    assert g.is_closed()
+
+
+def test_get_sample_metadata():
+    with pygwasvcf.GwasVcf(FILE) as g:
+        recs = g.get_sample_metadata()
+        assert "UKB-b:13008" in recs
+        assert "TotalVariants" in recs["UKB-b:13008"]
+        assert "VariantsNotRead" in recs["UKB-b:13008"]
+        assert "HarmonisedVariants" in recs["UKB-b:13008"]
+        assert "VariantsNotHarmonised" in recs["UKB-b:13008"]
+        assert "SwitchedAlleles" in recs["UKB-b:13008"]
+        assert "TotalControls" in recs["UKB-b:13008"]
+        assert "TotalCases" in recs["UKB-b:13008"]
+        assert "StudyType" in recs["UKB-b:13008"]
 
 
 def test_format_variant_record_for_rsidx():
@@ -36,12 +43,13 @@ def test_format_variant_record_for_rsidx():
 
 
 def test_index_rsid():
-    # index GWAS-VCF using rsidx
-    g = pygwasvcf.GwasVcf(FILE)
-    g.index_rsid()
-    g.close()
+    # index GWAS-VCF
+    with pygwasvcf.GwasVcf(FILE) as g:
+        g.index_rsid()
+
     # check index exists
     assert os.path.exists(FILE + ".rsidx")
+
     # check contents of index
     with sqlite3.connect(FILE + ".rsidx") as dbconn:
         cur = dbconn.cursor()
@@ -57,19 +65,18 @@ def test_index_rsid():
 
 
 def test_get_location_from_rsid():
-    g = pygwasvcf.GwasVcf(FILE)
-    g.index_rsid()
-    chrom, start, end = g.get_location_from_rsid("rs10399793")
-    g.close()
-    assert chrom == "1"
-    assert start == 49298
-    assert end == 49298
-    g = pygwasvcf.GwasVcf(FILE, rsidx_path=FILE + ".rsidx")
-    chrom, start, end = g.get_location_from_rsid("rs10399793")
-    g.close()
-    assert chrom == "1"
-    assert start == 49298
-    assert end == 49298
+    with pygwasvcf.GwasVcf(FILE) as g:
+        g.index_rsid()
+        chrom, start, end = g.get_location_from_rsid("rs10399793")
+        assert chrom == "1"
+        assert start == 49298
+        assert end == 49298
+
+    with pygwasvcf.GwasVcf(FILE, rsidx_path=FILE + ".rsidx") as g:
+        chrom, start, end = g.get_location_from_rsid("rs10399793")
+        assert chrom == "1"
+        assert start == 49298
+        assert end == 49298
 
 
 def check_first_row(row):
@@ -79,12 +86,11 @@ def check_first_row(row):
 
 
 def test_query():
-    g = pygwasvcf.GwasVcf(FILE)
-    g.index_rsid()
-    for num, row in enumerate(g.query(chrom="1", start=49298, end=49298)):
-        assert num == 1
-        check_first_row(row)
-    for num, row in enumerate(g.query(variant_id="rs10399793")):
-        assert num == 1
-        check_first_row(row)
-    g.close()
+    with pygwasvcf.GwasVcf(FILE) as g:
+        g.index_rsid()
+        for num, row in enumerate(g.query(chrom="1", start=49298, end=49298)):
+            assert num == 1
+            check_first_row(row)
+        for num, row in enumerate(g.query(variant_id="rs10399793")):
+            assert num == 1
+            check_first_row(row)
