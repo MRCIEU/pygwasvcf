@@ -72,8 +72,14 @@ with pygwasvcf.GwasVcf("/path/to/gwas.vcf.gz") as g:
         print(pygwasvcf.VariantRecordGwasFuns.get_af(variant, "trait_name"))
         # print variant-trait ID
         print(pygwasvcf.VariantRecordGwasFuns.get_id(variant, "trait_name"))
+        # create and print ID on-the-fly if missing
+        print(pygwasvcf.VariantRecordGwasFuns.get_id(variant, "trait_name", create_if_missing=True))
         # print variant-trait sample size
         print(pygwasvcf.VariantRecordGwasFuns.get_ss(variant, "trait_name"))
+        # print variant-trait total sample size from header if per-variant is missing
+        print(pygwasvcf.VariantRecordGwasFuns.get_ss(variant, "trait_name", g.get_metadata()))
         # print variant-trait number of cases
         print(pygwasvcf.VariantRecordGwasFuns.get_nc(variant, "trait_name"))
+        # print variant-trait total cases from header if per-variant is missing
+        print(pygwasvcf.VariantRecordGwasFuns.get_nc(variant, "trait_name", g.get_metadata()))
 ```
