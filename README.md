@@ -14,11 +14,11 @@ Parses GWAS-VCF with version 1.0 of the [specification](https://github.com/MRCIE
 pip install git+https://github.com/mrcieu/pygwasvcf
 ```
 
-## Summary statistics in GWAS-VCF
+## Data
 
 Download over 10,000 GWAS-VCF files contain full summary statistics from  <https://gwas.mrcieu.ac.uk>
 
-## Parser examples
+## Examples
 
 Read GWAS trait/study metadata
 
