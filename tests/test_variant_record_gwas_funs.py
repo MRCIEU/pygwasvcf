@@ -34,10 +34,20 @@ def test_get_af():
             assert pygwasvcf.VariantRecordGwasFuns.get_af(rec, TRAIT) == pytest.approx(0.623765)
 
 
-def test_get_id():
+def test_get_id_rsid():
     with pygwasvcf.GwasVcf(FILE) as g:
         for rec in g.query(contig=CHROM, start=START, stop=STOP):
             assert pygwasvcf.VariantRecordGwasFuns.get_id(rec, TRAIT) == "rs10399793"
+
+
+def test_get_id_chrpos():
+    with pygwasvcf.GwasVcf(FILE) as g:
+        for rec in g.query(contig=CHROM, start=START, stop=STOP):
+            assert pygwasvcf.VariantRecordGwasFuns.get_id(rec, TRAIT, create_if_missing=False) is not None
+            del rec.samples[TRAIT]['ID']
+            with pytest.raises(KeyError):
+                assert pygwasvcf.VariantRecordGwasFuns.get_id(rec, TRAIT, create_if_missing=False)
+            assert pygwasvcf.VariantRecordGwasFuns.get_id(rec, TRAIT, create_if_missing=True) == "1-49298-T-C"
 
 
 def test_get_ss():
@@ -47,11 +57,32 @@ def test_get_ss():
                 assert pygwasvcf.VariantRecordGwasFuns.get_ss(rec, TRAIT) == 0
 
 
+def test_get_ss_from_metadata():
+    with pygwasvcf.GwasVcf(FILE) as g:
+        metadata = g.get_metadata()
+        for rec in g.query(contig=CHROM, start=START, stop=STOP):
+            assert pygwasvcf.VariantRecordGwasFuns.get_ss(rec, TRAIT, metadata) == (463001 + 9)
+        del metadata[TRAIT]['TotalCases']
+        for rec in g.query(contig=CHROM, start=START, stop=STOP):
+            assert pygwasvcf.VariantRecordGwasFuns.get_ss(rec, TRAIT, metadata) == 463001
+
+
 def test_get_nc():
     with pygwasvcf.GwasVcf(FILE) as g:
         for rec in g.query(contig=CHROM, start=START, stop=STOP):
             with pytest.raises(KeyError):
-                assert pygwasvcf.VariantRecordGwasFuns.get_nc(rec, TRAIT) == 0
+                assert pygwasvcf.VariantRecordGwasFuns.get_nc(rec, TRAIT)
+
+
+def test_get_nc_from_metadata():
+    with pygwasvcf.GwasVcf(FILE) as g:
+        metadata = g.get_metadata()
+        for rec in g.query(contig=CHROM, start=START, stop=STOP):
+            assert pygwasvcf.VariantRecordGwasFuns.get_nc(rec, TRAIT, metadata) == 9
+        del metadata[TRAIT]['TotalCases']
+        with pytest.raises(KeyError):
+            for rec in g.query(contig=CHROM, start=START, stop=STOP):
+                pygwasvcf.VariantRecordGwasFuns.get_nc(rec, TRAIT, metadata)
 
 
 def test_transform_pval():

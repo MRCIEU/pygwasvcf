@@ -75,11 +75,13 @@ class VariantRecordGwasFuns:
 
     @staticmethod
     def get_id(variant_record, trait, create_if_missing=False):
-        if "ID" in variant_record.samples[trait]:
+        if "ID" in variant_record.samples[trait] and variant_record.samples[trait]['ID'] is not None:
             return variant_record.samples[trait]['ID']
         elif create_if_missing:
-            return variant_record.chrom + "-" + variant_record.pos + "-" + variant_record.ref + "-" + \
+            return variant_record.chrom + "-" + str(variant_record.pos) + "-" + variant_record.ref + "-" + \
                    variant_record.alts[0]
+        else:
+            raise KeyError("No ID available for this record")
 
     """
     Getter for the variant-trait sample size used to estimate the effect
@@ -95,9 +97,9 @@ class VariantRecordGwasFuns:
             return variant_record.samples[trait]['SS'][0]
         elif metadata is not None and 'TotalControls' in metadata[trait]:
             if 'TotalCases' in metadata[trait]:
-                return metadata[trait]['TotalControls'] + metadata[trait]['TotalCases']
+                return int(metadata[trait]['TotalControls']) + int(metadata[trait]['TotalCases'])
             else:
-                return metadata[trait]['TotalControls']
+                return int(metadata[trait]['TotalControls'])
         else:
             raise KeyError("No sample size available")
 
@@ -114,7 +116,7 @@ class VariantRecordGwasFuns:
         if 'NC' in variant_record.samples[trait]:
             return variant_record.samples[trait]['NC'][0]
         elif metadata is not None and 'TotalCases' in metadata[trait]:
-            return metadata[trait]['TotalCases']
+            return int(metadata[trait]['TotalCases'])
         else:
             raise KeyError("No sample size available")
 
