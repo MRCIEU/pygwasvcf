@@ -1,0 +1,606 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.8.1" />
+<title>pygwasvcf.gwas_vcf API documentation</title>
+<meta name="description" content="" />
+<link href='https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css' rel='stylesheet'>
+<link href='https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/8.0.0/sanitize.min.css' rel='stylesheet'>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>pygwasvcf.gwas_vcf</code></h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">from pysam import VariantFile
+import pygwasvcf
+import sqlite3
+import os
+
+&#34;&#34;&#34;
+Class to parse GWAS-VCF file using pysam
+&#34;&#34;&#34;
+
+
+class GwasVcf:
+    def __init__(self, file_path, rsidx_path=None):
+        &#34;&#34;&#34;
+        Constructor for GwasVcf class
+        :param file_path: Path to GWAS-VCF
+        :param rsidx_path: Path to RSIDX (optional)
+        &#34;&#34;&#34;
+        self.__file_path = file_path
+        self.__rsidx_path = rsidx_path
+        self.__vcf = None
+
+    def __enter__(self):
+        &#34;&#34;&#34;
+        Open VariantFile using with resources
+        &#34;&#34;&#34;
+        self.__vcf = VariantFile(self.__file_path)
+        return self
+
+    def __exit__(self, type, value, traceback):
+        &#34;&#34;&#34;
+        Close GWAS-VCF file handle
+        &#34;&#34;&#34;
+        self.__vcf.close()
+        self.__vcf = None
+
+    def is_closed(self):
+        return self.__vcf is None
+
+    @staticmethod
+    def format_variant_record_for_rsidx(rec):
+        &#34;&#34;&#34;
+        Function to extract data for RSIDX query
+        :param rec: pysam.VariantRecord
+        :return: rsid: dbSNP identifier as integer (rs removed)
+        :return: chrom: chromosome for association
+        :return: pos: position for association (1-based)
+        &#34;&#34;&#34;
+        for assoc in rec.samples:
+            var_id = rec.samples[assoc][&#39;ID&#39;]
+            if var_id is not None:
+                for rsid in var_id.split(&#34;;&#34;):
+                    if rsid[0:2] == &#34;rs&#34;:
+                        yield int(rsid[2:]), rec.chrom, rec.pos
+
+    def index_rsid(self):
+        &#34;&#34;&#34;
+        Index GWAS-VCF using rsID and pysam adapted from [rsidx](https://github.com/bioforensics/rsidx)
+        &#34;&#34;&#34;
+        if self.__vcf is None:
+            raise ValueError(&#34;Cannot use methods on the VCF object before the file is open.&#34;)
+
+        idx_path = self.__file_path + &#34;.rsidx&#34;
+        if os.path.exists(idx_path):
+            os.remove(idx_path)
+
+        with sqlite3.connect(idx_path) as dbconn:
+            # prepare database
+            c = dbconn.cursor()
+            c.execute(
+                &#39;CREATE TABLE rsid_to_coord (&#39;
+                &#39;rsid INTEGER PRIMARY KEY, &#39;
+                &#39;chrom TEXT NULL DEFAULT NULL, &#39;
+                &#39;coord INTEGER NOT NULL DEFAULT 0)&#39;
+            )
+            dbconn.commit()
+
+            # add variant records to SQLite DB
+            for rec in self.__vcf.fetch():
+                c.executemany(&#39;INSERT OR IGNORE INTO rsid_to_coord VALUES (?,?,?)&#39;,
+                              GwasVcf.format_variant_record_for_rsidx(rec))
+                dbconn.commit()
+
+        self.__rsidx_path = idx_path
+
+    def get_metadata(self):
+        &#34;&#34;&#34;
+        Extract metadata about the GWAS trait(s)
+        :return: res: Dict of Dict containing a key=value pairs for each trait in the GWAS-VCF
+        &#34;&#34;&#34;
+        if self.__vcf is None:
+            raise ValueError(&#34;Cannot use methods on the VCF object before the file is open.&#34;)
+        res = dict()
+        for rec in self.__vcf.header.records:
+            if rec.key == &#34;SAMPLE&#34;:
+                res[rec[&#39;ID&#39;]] = dict()
+                for k in rec:
+                    if k != &#34;ID&#34;:
+                        res[rec[&#39;ID&#39;]][k] = rec[k]
+        return res
+
+    def get_traits(self):
+        &#34;&#34;&#34;
+        Extract list of traits in the GWAS-VCF
+        :return: traits: List of traits
+        &#34;&#34;&#34;
+        return list(self.__vcf.header.samples)
+
+    def get_location_from_rsid(self, rsid):
+        &#34;&#34;&#34;
+        Helper function to convert rsID to chromosome and position using [rsidx](https://github.com/bioforensics/rsidx)
+        :param rsid: dbsnp indentifier
+        :return: res: chromosome
+        :return: res: position (1-based)
+        &#34;&#34;&#34;
+        if not rsid.startswith(&#34;rs&#34;):
+            raise ValueError(&#34;Variant ID query must be an rsID&#34;)
+        if self.__rsidx_path is None:
+            raise ValueError(&#34;Cannot query by variant identifier without providing an rsidx&#34;)
+        q = (int(rsid[2:]),)
+        with sqlite3.connect(self.__rsidx_path) as dbconn:
+            cur = dbconn.cursor()
+            cur.execute(&#39;SELECT DISTINCT chrom,coord FROM rsid_to_coord WHERE rsid =?&#39;, q)
+            res = cur.fetchone()
+        return res[0], res[1]
+
+    def query(self, contig=None, start=None, stop=None, variant_id=None, exclude_filtered=True):
+        &#34;&#34;&#34;
+        Variant-trait association query function
+        :param contig: Chromosome to query
+        :param start: Start position of interval (0-based)
+        :param stop: End position of interval (0-based)
+        :param variant_id: rsID to query using [rsidx](https://github.com/bioforensics/rsidx)
+        :param exclude_filtered: Boolean flag to remove record that do not meet QC
+        :return: rec: pysam.VariantRecord object containing chromosome, position, alleles, association statistics
+        &#34;&#34;&#34;
+        if self.__vcf is None:
+            raise ValueError(&#34;Cannot use methods on the VCF object before the file is open.&#34;)
+
+        if variant_id is not None:
+            if contig is not None or start is not None or stop is not None:
+                raise ValueError(&#34;Cannot provide chromosome, start or end with variant ID. Choose one query.&#34;)
+            contig, pos = self.get_location_from_rsid(variant_id)
+            start = pos - 1
+            stop = pos
+
+        # extract variant(s) from GWAS-VCF
+        for rec in self.__vcf.fetch(contig=contig, start=start, stop=stop):
+            # check multiallelics are on separate rows which is required for functions
+            pygwasvcf.VariantRecordGwasFuns.check_biallelic(rec)
+
+            # skip variants not meeting filter requirements
+            if exclude_filtered and rec.filter.keys()[0] != &#34;PASS&#34;:
+                continue
+
+            # lazy return record
+            yield rec</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="pygwasvcf.gwas_vcf.GwasVcf"><code class="flex name class">
+<span>class <span class="ident">GwasVcf</span></span>
+<span>(</span><span>file_path, rsidx_path=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Constructor for GwasVcf class
+:param file_path: Path to GWAS-VCF
+:param rsidx_path: Path to RSIDX (optional)</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class GwasVcf:
+    def __init__(self, file_path, rsidx_path=None):
+        &#34;&#34;&#34;
+        Constructor for GwasVcf class
+        :param file_path: Path to GWAS-VCF
+        :param rsidx_path: Path to RSIDX (optional)
+        &#34;&#34;&#34;
+        self.__file_path = file_path
+        self.__rsidx_path = rsidx_path
+        self.__vcf = None
+
+    def __enter__(self):
+        &#34;&#34;&#34;
+        Open VariantFile using with resources
+        &#34;&#34;&#34;
+        self.__vcf = VariantFile(self.__file_path)
+        return self
+
+    def __exit__(self, type, value, traceback):
+        &#34;&#34;&#34;
+        Close GWAS-VCF file handle
+        &#34;&#34;&#34;
+        self.__vcf.close()
+        self.__vcf = None
+
+    def is_closed(self):
+        return self.__vcf is None
+
+    @staticmethod
+    def format_variant_record_for_rsidx(rec):
+        &#34;&#34;&#34;
+        Function to extract data for RSIDX query
+        :param rec: pysam.VariantRecord
+        :return: rsid: dbSNP identifier as integer (rs removed)
+        :return: chrom: chromosome for association
+        :return: pos: position for association (1-based)
+        &#34;&#34;&#34;
+        for assoc in rec.samples:
+            var_id = rec.samples[assoc][&#39;ID&#39;]
+            if var_id is not None:
+                for rsid in var_id.split(&#34;;&#34;):
+                    if rsid[0:2] == &#34;rs&#34;:
+                        yield int(rsid[2:]), rec.chrom, rec.pos
+
+    def index_rsid(self):
+        &#34;&#34;&#34;
+        Index GWAS-VCF using rsID and pysam adapted from [rsidx](https://github.com/bioforensics/rsidx)
+        &#34;&#34;&#34;
+        if self.__vcf is None:
+            raise ValueError(&#34;Cannot use methods on the VCF object before the file is open.&#34;)
+
+        idx_path = self.__file_path + &#34;.rsidx&#34;
+        if os.path.exists(idx_path):
+            os.remove(idx_path)
+
+        with sqlite3.connect(idx_path) as dbconn:
+            # prepare database
+            c = dbconn.cursor()
+            c.execute(
+                &#39;CREATE TABLE rsid_to_coord (&#39;
+                &#39;rsid INTEGER PRIMARY KEY, &#39;
+                &#39;chrom TEXT NULL DEFAULT NULL, &#39;
+                &#39;coord INTEGER NOT NULL DEFAULT 0)&#39;
+            )
+            dbconn.commit()
+
+            # add variant records to SQLite DB
+            for rec in self.__vcf.fetch():
+                c.executemany(&#39;INSERT OR IGNORE INTO rsid_to_coord VALUES (?,?,?)&#39;,
+                              GwasVcf.format_variant_record_for_rsidx(rec))
+                dbconn.commit()
+
+        self.__rsidx_path = idx_path
+
+    def get_metadata(self):
+        &#34;&#34;&#34;
+        Extract metadata about the GWAS trait(s)
+        :return: res: Dict of Dict containing a key=value pairs for each trait in the GWAS-VCF
+        &#34;&#34;&#34;
+        if self.__vcf is None:
+            raise ValueError(&#34;Cannot use methods on the VCF object before the file is open.&#34;)
+        res = dict()
+        for rec in self.__vcf.header.records:
+            if rec.key == &#34;SAMPLE&#34;:
+                res[rec[&#39;ID&#39;]] = dict()
+                for k in rec:
+                    if k != &#34;ID&#34;:
+                        res[rec[&#39;ID&#39;]][k] = rec[k]
+        return res
+
+    def get_traits(self):
+        &#34;&#34;&#34;
+        Extract list of traits in the GWAS-VCF
+        :return: traits: List of traits
+        &#34;&#34;&#34;
+        return list(self.__vcf.header.samples)
+
+    def get_location_from_rsid(self, rsid):
+        &#34;&#34;&#34;
+        Helper function to convert rsID to chromosome and position using [rsidx](https://github.com/bioforensics/rsidx)
+        :param rsid: dbsnp indentifier
+        :return: res: chromosome
+        :return: res: position (1-based)
+        &#34;&#34;&#34;
+        if not rsid.startswith(&#34;rs&#34;):
+            raise ValueError(&#34;Variant ID query must be an rsID&#34;)
+        if self.__rsidx_path is None:
+            raise ValueError(&#34;Cannot query by variant identifier without providing an rsidx&#34;)
+        q = (int(rsid[2:]),)
+        with sqlite3.connect(self.__rsidx_path) as dbconn:
+            cur = dbconn.cursor()
+            cur.execute(&#39;SELECT DISTINCT chrom,coord FROM rsid_to_coord WHERE rsid =?&#39;, q)
+            res = cur.fetchone()
+        return res[0], res[1]
+
+    def query(self, contig=None, start=None, stop=None, variant_id=None, exclude_filtered=True):
+        &#34;&#34;&#34;
+        Variant-trait association query function
+        :param contig: Chromosome to query
+        :param start: Start position of interval (0-based)
+        :param stop: End position of interval (0-based)
+        :param variant_id: rsID to query using [rsidx](https://github.com/bioforensics/rsidx)
+        :param exclude_filtered: Boolean flag to remove record that do not meet QC
+        :return: rec: pysam.VariantRecord object containing chromosome, position, alleles, association statistics
+        &#34;&#34;&#34;
+        if self.__vcf is None:
+            raise ValueError(&#34;Cannot use methods on the VCF object before the file is open.&#34;)
+
+        if variant_id is not None:
+            if contig is not None or start is not None or stop is not None:
+                raise ValueError(&#34;Cannot provide chromosome, start or end with variant ID. Choose one query.&#34;)
+            contig, pos = self.get_location_from_rsid(variant_id)
+            start = pos - 1
+            stop = pos
+
+        # extract variant(s) from GWAS-VCF
+        for rec in self.__vcf.fetch(contig=contig, start=start, stop=stop):
+            # check multiallelics are on separate rows which is required for functions
+            pygwasvcf.VariantRecordGwasFuns.check_biallelic(rec)
+
+            # skip variants not meeting filter requirements
+            if exclude_filtered and rec.filter.keys()[0] != &#34;PASS&#34;:
+                continue
+
+            # lazy return record
+            yield rec</code></pre>
+</details>
+<h3>Static methods</h3>
+<dl>
+<dt id="pygwasvcf.gwas_vcf.GwasVcf.format_variant_record_for_rsidx"><code class="name flex">
+<span>def <span class="ident">format_variant_record_for_rsidx</span></span>(<span>rec)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Function to extract data for RSIDX query
+:param rec: pysam.VariantRecord
+:return: rsid: dbSNP identifier as integer (rs removed)
+:return: chrom: chromosome for association
+:return: pos: position for association (1-based)</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@staticmethod
+def format_variant_record_for_rsidx(rec):
+    &#34;&#34;&#34;
+    Function to extract data for RSIDX query
+    :param rec: pysam.VariantRecord
+    :return: rsid: dbSNP identifier as integer (rs removed)
+    :return: chrom: chromosome for association
+    :return: pos: position for association (1-based)
+    &#34;&#34;&#34;
+    for assoc in rec.samples:
+        var_id = rec.samples[assoc][&#39;ID&#39;]
+        if var_id is not None:
+            for rsid in var_id.split(&#34;;&#34;):
+                if rsid[0:2] == &#34;rs&#34;:
+                    yield int(rsid[2:]), rec.chrom, rec.pos</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="pygwasvcf.gwas_vcf.GwasVcf.get_location_from_rsid"><code class="name flex">
+<span>def <span class="ident">get_location_from_rsid</span></span>(<span>self, rsid)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Helper function to convert rsID to chromosome and position using <a href="https://github.com/bioforensics/rsidx">rsidx</a>
+:param rsid: dbsnp indentifier
+:return: res: chromosome
+:return: res: position (1-based)</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_location_from_rsid(self, rsid):
+    &#34;&#34;&#34;
+    Helper function to convert rsID to chromosome and position using [rsidx](https://github.com/bioforensics/rsidx)
+    :param rsid: dbsnp indentifier
+    :return: res: chromosome
+    :return: res: position (1-based)
+    &#34;&#34;&#34;
+    if not rsid.startswith(&#34;rs&#34;):
+        raise ValueError(&#34;Variant ID query must be an rsID&#34;)
+    if self.__rsidx_path is None:
+        raise ValueError(&#34;Cannot query by variant identifier without providing an rsidx&#34;)
+    q = (int(rsid[2:]),)
+    with sqlite3.connect(self.__rsidx_path) as dbconn:
+        cur = dbconn.cursor()
+        cur.execute(&#39;SELECT DISTINCT chrom,coord FROM rsid_to_coord WHERE rsid =?&#39;, q)
+        res = cur.fetchone()
+    return res[0], res[1]</code></pre>
+</details>
+</dd>
+<dt id="pygwasvcf.gwas_vcf.GwasVcf.get_metadata"><code class="name flex">
+<span>def <span class="ident">get_metadata</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Extract metadata about the GWAS trait(s)
+:return: res: Dict of Dict containing a key=value pairs for each trait in the GWAS-VCF</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_metadata(self):
+    &#34;&#34;&#34;
+    Extract metadata about the GWAS trait(s)
+    :return: res: Dict of Dict containing a key=value pairs for each trait in the GWAS-VCF
+    &#34;&#34;&#34;
+    if self.__vcf is None:
+        raise ValueError(&#34;Cannot use methods on the VCF object before the file is open.&#34;)
+    res = dict()
+    for rec in self.__vcf.header.records:
+        if rec.key == &#34;SAMPLE&#34;:
+            res[rec[&#39;ID&#39;]] = dict()
+            for k in rec:
+                if k != &#34;ID&#34;:
+                    res[rec[&#39;ID&#39;]][k] = rec[k]
+    return res</code></pre>
+</details>
+</dd>
+<dt id="pygwasvcf.gwas_vcf.GwasVcf.get_traits"><code class="name flex">
+<span>def <span class="ident">get_traits</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Extract list of traits in the GWAS-VCF
+:return: traits: List of traits</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_traits(self):
+    &#34;&#34;&#34;
+    Extract list of traits in the GWAS-VCF
+    :return: traits: List of traits
+    &#34;&#34;&#34;
+    return list(self.__vcf.header.samples)</code></pre>
+</details>
+</dd>
+<dt id="pygwasvcf.gwas_vcf.GwasVcf.index_rsid"><code class="name flex">
+<span>def <span class="ident">index_rsid</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Index GWAS-VCF using rsID and pysam adapted from <a href="https://github.com/bioforensics/rsidx">rsidx</a></p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def index_rsid(self):
+    &#34;&#34;&#34;
+    Index GWAS-VCF using rsID and pysam adapted from [rsidx](https://github.com/bioforensics/rsidx)
+    &#34;&#34;&#34;
+    if self.__vcf is None:
+        raise ValueError(&#34;Cannot use methods on the VCF object before the file is open.&#34;)
+
+    idx_path = self.__file_path + &#34;.rsidx&#34;
+    if os.path.exists(idx_path):
+        os.remove(idx_path)
+
+    with sqlite3.connect(idx_path) as dbconn:
+        # prepare database
+        c = dbconn.cursor()
+        c.execute(
+            &#39;CREATE TABLE rsid_to_coord (&#39;
+            &#39;rsid INTEGER PRIMARY KEY, &#39;
+            &#39;chrom TEXT NULL DEFAULT NULL, &#39;
+            &#39;coord INTEGER NOT NULL DEFAULT 0)&#39;
+        )
+        dbconn.commit()
+
+        # add variant records to SQLite DB
+        for rec in self.__vcf.fetch():
+            c.executemany(&#39;INSERT OR IGNORE INTO rsid_to_coord VALUES (?,?,?)&#39;,
+                          GwasVcf.format_variant_record_for_rsidx(rec))
+            dbconn.commit()
+
+    self.__rsidx_path = idx_path</code></pre>
+</details>
+</dd>
+<dt id="pygwasvcf.gwas_vcf.GwasVcf.is_closed"><code class="name flex">
+<span>def <span class="ident">is_closed</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def is_closed(self):
+    return self.__vcf is None</code></pre>
+</details>
+</dd>
+<dt id="pygwasvcf.gwas_vcf.GwasVcf.query"><code class="name flex">
+<span>def <span class="ident">query</span></span>(<span>self, contig=None, start=None, stop=None, variant_id=None, exclude_filtered=True)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Variant-trait association query function
+:param contig: Chromosome to query
+:param start: Start position of interval (0-based)
+:param stop: End position of interval (0-based)
+:param variant_id: rsID to query using <a href="https://github.com/bioforensics/rsidx">rsidx</a>
+:param exclude_filtered: Boolean flag to remove record that do not meet QC
+:return: rec: pysam.VariantRecord object containing chromosome, position, alleles, association statistics</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def query(self, contig=None, start=None, stop=None, variant_id=None, exclude_filtered=True):
+    &#34;&#34;&#34;
+    Variant-trait association query function
+    :param contig: Chromosome to query
+    :param start: Start position of interval (0-based)
+    :param stop: End position of interval (0-based)
+    :param variant_id: rsID to query using [rsidx](https://github.com/bioforensics/rsidx)
+    :param exclude_filtered: Boolean flag to remove record that do not meet QC
+    :return: rec: pysam.VariantRecord object containing chromosome, position, alleles, association statistics
+    &#34;&#34;&#34;
+    if self.__vcf is None:
+        raise ValueError(&#34;Cannot use methods on the VCF object before the file is open.&#34;)
+
+    if variant_id is not None:
+        if contig is not None or start is not None or stop is not None:
+            raise ValueError(&#34;Cannot provide chromosome, start or end with variant ID. Choose one query.&#34;)
+        contig, pos = self.get_location_from_rsid(variant_id)
+        start = pos - 1
+        stop = pos
+
+    # extract variant(s) from GWAS-VCF
+    for rec in self.__vcf.fetch(contig=contig, start=start, stop=stop):
+        # check multiallelics are on separate rows which is required for functions
+        pygwasvcf.VariantRecordGwasFuns.check_biallelic(rec)
+
+        # skip variants not meeting filter requirements
+        if exclude_filtered and rec.filter.keys()[0] != &#34;PASS&#34;:
+            continue
+
+        # lazy return record
+        yield rec</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="pygwasvcf" href="index.html">pygwasvcf</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="pygwasvcf.gwas_vcf.GwasVcf" href="#pygwasvcf.gwas_vcf.GwasVcf">GwasVcf</a></code></h4>
+<ul class="">
+<li><code><a title="pygwasvcf.gwas_vcf.GwasVcf.format_variant_record_for_rsidx" href="#pygwasvcf.gwas_vcf.GwasVcf.format_variant_record_for_rsidx">format_variant_record_for_rsidx</a></code></li>
+<li><code><a title="pygwasvcf.gwas_vcf.GwasVcf.get_location_from_rsid" href="#pygwasvcf.gwas_vcf.GwasVcf.get_location_from_rsid">get_location_from_rsid</a></code></li>
+<li><code><a title="pygwasvcf.gwas_vcf.GwasVcf.get_metadata" href="#pygwasvcf.gwas_vcf.GwasVcf.get_metadata">get_metadata</a></code></li>
+<li><code><a title="pygwasvcf.gwas_vcf.GwasVcf.get_traits" href="#pygwasvcf.gwas_vcf.GwasVcf.get_traits">get_traits</a></code></li>
+<li><code><a title="pygwasvcf.gwas_vcf.GwasVcf.index_rsid" href="#pygwasvcf.gwas_vcf.GwasVcf.index_rsid">index_rsid</a></code></li>
+<li><code><a title="pygwasvcf.gwas_vcf.GwasVcf.is_closed" href="#pygwasvcf.gwas_vcf.GwasVcf.is_closed">is_closed</a></code></li>
+<li><code><a title="pygwasvcf.gwas_vcf.GwasVcf.query" href="#pygwasvcf.gwas_vcf.GwasVcf.query">query</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.8.1</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad()</script>
+</body>
+</html>
