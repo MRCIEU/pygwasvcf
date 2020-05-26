@@ -63,11 +63,15 @@ with pygwasvcf.GwasVcf("/path/to/gwas.vcf.gz") as g:
     # query by chromosome and position interval
     for variant in g.query(contig="1", start=1, stop=1):
         # print variant-trait P value
-        print(variant.get_pval("trait_name"))
+        print(pygwasvcf.VariantRecordGwasFuns.get_pval(variant, "trait_name"))
         # print variant-trait SE
-        print(variant.get_se("trait_name"))
+        print(pygwasvcf.VariantRecordGwasFuns.get_se(variant, "trait_name"))
         # print variant-trait beta
-        print(variant.get_beta("trait_name"))
-        # print variant-trait allele frequency in study
-        print(variant.get_af("trait_name"))
+        print(pygwasvcf.VariantRecordGwasFuns.get_beta(variant, "trait_name"))
+        # print variant-trait allele frequency
+        print(pygwasvcf.VariantRecordGwasFuns.get_af(variant, "trait_name"))
+        # print variant-trait ID
+        print(pygwasvcf.VariantRecordGwasFuns.get_id(variant, "trait_name"))
+        # print variant-trait sample size
+        print(pygwasvcf.VariantRecordGwasFuns.get_ss(variant, "trait_name"))
 ```

@@ -47,6 +47,13 @@ def test_get_ss():
                 assert pygwasvcf.VariantRecordGwasFuns.get_ss(rec, TRAIT) == 0
 
 
+def test_get_nc():
+    with pygwasvcf.GwasVcf(FILE) as g:
+        for rec in g.query(contig=CHROM, start=START, stop=STOP):
+            with pytest.raises(KeyError):
+                assert pygwasvcf.VariantRecordGwasFuns.get_nc(rec, TRAIT) == 0
+
+
 def test_transform_pval():
     p = 0.01
     logp = -log10(p)
