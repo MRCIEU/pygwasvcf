@@ -83,3 +83,7 @@ with pygwasvcf.GwasVcf("/path/to/gwas.vcf.gz") as g:
         # print variant-trait total cases from header if per-variant is missing
         print(pygwasvcf.VariantRecordGwasFuns.get_nc(variant, "trait_name", g.get_metadata()))
 ```
+
+## Documentation
+
+API documentation available from <https://mrcieu.github.io/pygwasvcf>
