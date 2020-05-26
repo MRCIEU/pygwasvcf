@@ -74,4 +74,6 @@ with pygwasvcf.GwasVcf("/path/to/gwas.vcf.gz") as g:
         print(pygwasvcf.VariantRecordGwasFuns.get_id(variant, "trait_name"))
         # print variant-trait sample size
         print(pygwasvcf.VariantRecordGwasFuns.get_ss(variant, "trait_name"))
+        # print variant-trait number of cases
+        print(pygwasvcf.VariantRecordGwasFuns.get_nc(variant, "trait_name"))
 ```

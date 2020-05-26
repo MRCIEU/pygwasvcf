@@ -69,34 +69,54 @@ class VariantRecordGwasFuns:
     Getter for the variant-trait variant ID
     :param variant_record: pysam.VariantRecord object for the VCF row
     :param trait: Name of the trait
+    :param create_if_missing: Create ID in the format chrom-pos-ref-alt if no ID is available
     :return Variant/marker identifier
     """
 
     @staticmethod
-    def get_id(variant_record, trait):
-        return variant_record.samples[trait]['ID']
+    def get_id(variant_record, trait, create_if_missing=False):
+        if "ID" in variant_record.samples[trait]:
+            return variant_record.samples[trait]['ID']
+        elif create_if_missing:
+            return variant_record.chrom + "-" + variant_record.pos + "-" + variant_record.ref + "-" + \
+                   variant_record.alts[0]
 
     """
     Getter for the variant-trait sample size used to estimate the effect
     :param variant_record: pysam.VariantRecord object for the VCF row
     :param trait: Name of the trait
+    :param metadata: If the per-variant sample size if missing then taken from global metadata (optional)
     :return Total sample size used to estimate the association effect size
     """
 
     @staticmethod
-    def get_ss(variant_record, trait):
-        return variant_record.samples[trait]['SS'][0]
+    def get_ss(variant_record, trait, metadata=None):
+        if 'SS' in variant_record.samples[trait]:
+            return variant_record.samples[trait]['SS'][0]
+        elif metadata is not None and 'TotalControls' in metadata[trait]:
+            if 'TotalCases' in metadata[trait]:
+                return metadata[trait]['TotalControls'] + metadata[trait]['TotalCases']
+            else:
+                return metadata[trait]['TotalControls']
+        else:
+            raise KeyError("No sample size available")
 
     """
     Getter for the variant-trait number of cases size used to estimate the effect
     :param variant_record: pysam.VariantRecord object for the VCF row
     :param trait: Name of the trait
+    :param metadata: If the per-variant sample size if missing then taken from global metadata (optional)
     :return Number of cases used to estimate the association effect size
     """
 
     @staticmethod
-    def get_nc(variant_record, trait):
-        return variant_record.samples[trait]['NC'][0]
+    def get_nc(variant_record, trait, metadata=None):
+        if 'NC' in variant_record.samples[trait]:
+            return variant_record.samples[trait]['NC'][0]
+        elif metadata is not None and 'TotalCases' in metadata[trait]:
+            return metadata[trait]['TotalCases']
+        else:
+            raise KeyError("No sample size available")
 
     """
     Check the VCF record only contains a bi-allelic change; multi-allelic changes should be on separate rows 
