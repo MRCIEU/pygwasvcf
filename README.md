@@ -16,7 +16,7 @@ pip install git+https://github.com/mrcieu/pygwasvcf
 
 ## Data
 
-Download over 10,000 GWAS-VCF files contain full summary statistics from  <https://gwas.mrcieu.ac.uk>
+Download over 10,000 GWAS-VCF files from  <https://gwas.mrcieu.ac.uk>
 
 ## Examples
 
