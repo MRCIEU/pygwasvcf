@@ -42,7 +42,7 @@ class GwasVcf:
         :param rec:
         :return: rsid: dbSNP identifier as integer (rs removed)
         :return: chrom: chromosome for association
-        :return: pos: base-position for association
+        :return: pos: 1-based position for association
         """
         for assoc in rec.samples:
             var_id = rec.samples[assoc]['ID']
@@ -81,9 +81,9 @@ class GwasVcf:
 
         self.__rsidx_path = idx_path
 
-    def get_sample_metadata(self):
+    def get_metadata(self):
         """
-        Extract metadata about the GWAS trait
+        Extract metadata about the GWAS trait(s)
         :return: res: Dict of Dict containing a key=value pairs for each trait in the GWAS-VCF
         """
         if self.__vcf is None:
@@ -97,13 +97,19 @@ class GwasVcf:
                         res[rec['ID']][k] = rec[k]
         return res
 
+    def get_traits(self):
+        """
+        Extract list of traits in the GWAS-VCF
+        :return: traits: List of traits
+        """
+        return list(self.__vcf.header.samples)
+
     def get_location_from_rsid(self, rsid):
         """
         Helper function to convert rsID to chromosome and position using [rsidx](https://github.com/bioforensics/rsidx)
         :param rsid: dbsnp indentifier
         :return: res: chromosome
-        :return: res: start
-        :return: res: end
+        :return: res: position (1-based)
         """
         if not rsid.startswith("rs"):
             raise ValueError("Variant ID query must be an rsID")
@@ -114,31 +120,28 @@ class GwasVcf:
             cur = dbconn.cursor()
             cur.execute('SELECT DISTINCT chrom,coord FROM rsid_to_coord WHERE rsid =?', q)
             res = cur.fetchone()
-        return res[0], res[1], res[1]
+        return res[0], res[1]
 
-    def query(self, chrom=None, start=None, end=None, variant_id=None, exclude_filtered=True):
+    def query(self, contig=None, start=None, stop=None, variant_id=None, exclude_filtered=True):
         """
         Variant-trait association query function
-        :param chrom: Chromosome to query
-        :param start: Start position of interval (1-based)
-        :param end: End position of interval (1-based)
+        :param contig: Chromosome to query
+        :param start: Start position of interval (0-based)
+        :param stop: End position of interval (0-based)
         :param variant_id: rsID to query using [rsidx](https://github.com/bioforensics/rsidx)
         :param exclude_filtered: Boolean flag to remove record that do not meet QC
         :return: rec: VariantRecordGwas object containing chromosome, position, alleles, association statistics
         """
         if self.__vcf is None:
             raise ValueError("Cannot use methods on the VCF object before the file is open.")
-        if variant_id is None:
-            if chrom is None or start is None or end is None:
-                raise ValueError(
-                    "You must provide a genomic location range or variant identifier to perform the query.")
-        else:
-            if chrom is not None or start is not None or end is not None:
+        if variant_id is not None:
+            if contig is not None or start is not None or stop is not None:
                 raise ValueError("Cannot provide chromosome, start or end with variant ID. Choose one query.")
-            chrom, start, end = self.get_location_from_rsid(variant_id)
+            contig, stop = self.get_location_from_rsid(variant_id)
+            start = stop - 1
 
         # extract variant(s) from GWAS-VCF
-        for rec in self.__vcf.fetch(chrom, start, end):
+        for rec in self.__vcf.fetch(contig=contig, start=start, stop=stop):
             # Extend to VariantRecord to provide useful funcs for GWAS assoc
             rec.__class__ = pygwasvcf.VariantRecordGwas
             rec.check_biallelic()

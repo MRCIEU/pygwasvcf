@@ -15,9 +15,9 @@ def test_close():
     assert g.is_closed()
 
 
-def test_get_sample_metadata():
+def test_get_metadata():
     with pygwasvcf.GwasVcf(FILE) as g:
-        recs = g.get_sample_metadata()
+        recs = g.get_metadata()
         assert "UKB-b:13008" in recs
         assert "TotalVariants" in recs["UKB-b:13008"]
         assert "VariantsNotRead" in recs["UKB-b:13008"]
@@ -43,6 +43,10 @@ def test_format_variant_record_for_rsidx():
 
 
 def test_index_rsid():
+    # delete old index if present
+    if os.path.exists(FILE + ".rsidx"):
+        os.remove(FILE + ".rsidx")
+
     # index GWAS-VCF
     with pygwasvcf.GwasVcf(FILE) as g:
         g.index_rsid()
@@ -67,16 +71,14 @@ def test_index_rsid():
 def test_get_location_from_rsid():
     with pygwasvcf.GwasVcf(FILE) as g:
         g.index_rsid()
-        chrom, start, end = g.get_location_from_rsid("rs10399793")
+        chrom, pos = g.get_location_from_rsid("rs10399793")
         assert chrom == "1"
-        assert start == 49298
-        assert end == 49298
+        assert pos == 49298
 
     with pygwasvcf.GwasVcf(FILE, rsidx_path=FILE + ".rsidx") as g:
-        chrom, start, end = g.get_location_from_rsid("rs10399793")
+        chrom, pos = g.get_location_from_rsid("rs10399793")
         assert chrom == "1"
-        assert start == 49298
-        assert end == 49298
+        assert pos == 49298
 
 
 def check_first_row(row):
@@ -88,9 +90,33 @@ def check_first_row(row):
 def test_query():
     with pygwasvcf.GwasVcf(FILE) as g:
         g.index_rsid()
-        for num, row in enumerate(g.query(chrom="1", start=49298, end=49298)):
-            assert num == 1
+        for num, row in enumerate(g.query(contig="1", start=49297, stop=49298)):
+            assert num == 0
             check_first_row(row)
         for num, row in enumerate(g.query(variant_id="rs10399793")):
-            assert num == 1
+            assert num == 0
             check_first_row(row)
+        j = 0
+        for num, row in enumerate(g.query()):
+            j = num
+            if num == 0:
+                check_first_row(row)
+        assert j > 0
+
+
+def test_vcf_query_can_be_null():
+    vcf = pysam.VariantFile(FILE)
+    j = 0
+    for num, row in enumerate(vcf.fetch(contig=None, start=None, stop=None)):
+        j = num
+        if num == 0:
+            check_first_row(row)
+    assert j > 0
+    vcf.close()
+
+def test_class_assignment():
+    vcf = pysam.VariantFile(FILE)
+    for rec in vcf.fetch():
+        print(type(rec), rec)
+        rec.__class__ = pygwasvcf.VariantRecordGwas
+    vcf.close()

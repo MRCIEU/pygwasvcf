@@ -26,7 +26,7 @@ Read GWAS trait/study metadata
 import pygwasvcf
 with pygwasvcf.GwasVcf("/path/to/gwas.vcf.gz") as g:
     # print dictionary of GWAS metadata
-    print(g.get_sample_metadata())
+    print(g.get_metadata())
 ```
 
 Query variant-trait association(s) by chromosome and position location
@@ -35,7 +35,7 @@ Query variant-trait association(s) by chromosome and position location
 import pygwasvcf
 with pygwasvcf.GwasVcf("/path/to/gwas.vcf.gz") as g:
     # query by chromosome and position interval
-    for variant in g.query(chrom="1", start=1, end=1):
+    for variant in g.query(contig="1", start=1, stop=1):
         print(variant)
 ```
 
@@ -61,7 +61,7 @@ Extract summary statistics from a variant object
 import pygwasvcf
 with pygwasvcf.GwasVcf("/path/to/gwas.vcf.gz") as g:
     # query by chromosome and position interval
-    for variant in g.query(chrom="1", start=1, end=1):
+    for variant in g.query(contig="1", start=1, stop=1):
         # print variant-trait P value
         print(variant.get_pval("trait_name"))
         # print variant-trait SE
