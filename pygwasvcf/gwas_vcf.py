@@ -3,7 +3,8 @@ import pygwasvcf
 import sqlite3
 import os
 
-"""Class to parse GWAS-VCF file
+"""
+Class to parse GWAS-VCF file using pysam
 """
 
 
@@ -39,10 +40,10 @@ class GwasVcf:
     def format_variant_record_for_rsidx(rec):
         """
         Function to extract data for RSIDX query
-        :param rec:
+        :param rec: pysam.VariantRecord
         :return: rsid: dbSNP identifier as integer (rs removed)
         :return: chrom: chromosome for association
-        :return: pos: 1-based position for association
+        :return: pos: position for association (1-based)
         """
         for assoc in rec.samples:
             var_id = rec.samples[assoc]['ID']
@@ -130,24 +131,25 @@ class GwasVcf:
         :param stop: End position of interval (0-based)
         :param variant_id: rsID to query using [rsidx](https://github.com/bioforensics/rsidx)
         :param exclude_filtered: Boolean flag to remove record that do not meet QC
-        :return: rec: VariantRecordGwas object containing chromosome, position, alleles, association statistics
+        :return: rec: pysam.VariantRecord object containing chromosome, position, alleles, association statistics
         """
         if self.__vcf is None:
             raise ValueError("Cannot use methods on the VCF object before the file is open.")
+
         if variant_id is not None:
             if contig is not None or start is not None or stop is not None:
                 raise ValueError("Cannot provide chromosome, start or end with variant ID. Choose one query.")
-            contig, stop = self.get_location_from_rsid(variant_id)
-            start = stop - 1
+            contig, pos = self.get_location_from_rsid(variant_id)
+            start = pos - 1
+            stop = pos
 
         # extract variant(s) from GWAS-VCF
         for rec in self.__vcf.fetch(contig=contig, start=start, stop=stop):
-            # Extend to VariantRecord to provide useful funcs for GWAS assoc
-            rec.__class__ = pygwasvcf.VariantRecordGwas
-            rec.check_biallelic()
+            # check multiallelics are on separate rows which is required for functions
+            pygwasvcf.VariantRecordGwasFuns.check_biallelic(rec)
 
             # skip variants not meeting filter requirements
-            if exclude_filtered and rec.filter != "PASS":
+            if exclude_filtered and str(rec.filter) != "PASS":
                 continue
 
             # lazy return record

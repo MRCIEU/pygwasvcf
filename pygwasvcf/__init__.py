@@ -2,4 +2,4 @@
 """
 import os
 from pygwasvcf.gwas_vcf import *
-from pygwasvcf.variant_record_gwas import *
+from pygwasvcf.variant_record_gwas_funs import *

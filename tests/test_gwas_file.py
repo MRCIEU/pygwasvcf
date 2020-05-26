@@ -2,8 +2,8 @@ import pygwasvcf
 import pysam
 import os
 import sqlite3
-import pytest
 
+TRAIT = "UKB-b:13008"
 FILE = os.path.join(os.path.dirname(__file__), "data", "case.control.example.vcf.gz")
 
 
@@ -18,15 +18,15 @@ def test_close():
 def test_get_metadata():
     with pygwasvcf.GwasVcf(FILE) as g:
         recs = g.get_metadata()
-        assert "UKB-b:13008" in recs
-        assert "TotalVariants" in recs["UKB-b:13008"]
-        assert "VariantsNotRead" in recs["UKB-b:13008"]
-        assert "HarmonisedVariants" in recs["UKB-b:13008"]
-        assert "VariantsNotHarmonised" in recs["UKB-b:13008"]
-        assert "SwitchedAlleles" in recs["UKB-b:13008"]
-        assert "TotalControls" in recs["UKB-b:13008"]
-        assert "TotalCases" in recs["UKB-b:13008"]
-        assert "StudyType" in recs["UKB-b:13008"]
+        assert TRAIT in recs
+        assert "TotalVariants" in recs[TRAIT]
+        assert "VariantsNotRead" in recs[TRAIT]
+        assert "HarmonisedVariants" in recs[TRAIT]
+        assert "VariantsNotHarmonised" in recs[TRAIT]
+        assert "SwitchedAlleles" in recs[TRAIT]
+        assert "TotalControls" in recs[TRAIT]
+        assert "TotalCases" in recs[TRAIT]
+        assert "StudyType" in recs[TRAIT]
 
 
 def test_format_variant_record_for_rsidx():
@@ -84,39 +84,36 @@ def test_get_location_from_rsid():
 def check_first_row(row):
     assert row.chrom == "1"
     assert row.pos == 49298
-    assert row.get_pval("UKB-b:13008") == pytest.approx(0.9599999)
 
 
-def test_query():
+def test():
+    def r():
+        vcf = pysam.VariantFile(FILE)
+        for it in vcf.fetch(contig=None, start=None, stop=None):
+            yield it
+        vcf.close()
+
+    for num, row in enumerate(r()):
+        print(num, row)
+
+
+def test_query_by_chr_pos():
     with pygwasvcf.GwasVcf(FILE) as g:
-        g.index_rsid()
         for num, row in enumerate(g.query(contig="1", start=49297, stop=49298)):
             assert num == 0
             check_first_row(row)
+
+
+def test_query_by_rsid():
+    with pygwasvcf.GwasVcf(FILE) as g:
+        g.index_rsid()
         for num, row in enumerate(g.query(variant_id="rs10399793")):
             assert num == 0
             check_first_row(row)
-        j = 0
-        for num, row in enumerate(g.query()):
-            j = num
-            if num == 0:
-                check_first_row(row)
-        assert j > 0
 
 
-def test_vcf_query_can_be_null():
-    vcf = pysam.VariantFile(FILE)
-    j = 0
-    for num, row in enumerate(vcf.fetch(contig=None, start=None, stop=None)):
-        j = num
-        if num == 0:
-            check_first_row(row)
-    assert j > 0
-    vcf.close()
-
-def test_class_assignment():
-    vcf = pysam.VariantFile(FILE)
-    for rec in vcf.fetch():
-        print(type(rec), rec)
-        rec.__class__ = pygwasvcf.VariantRecordGwas
-    vcf.close()
+def test_query_all():
+    with pygwasvcf.GwasVcf(FILE) as g:
+        recs = g.query(contig="1", start=49297, stop=49298)
+        for row in recs:
+            print(row)
