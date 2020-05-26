@@ -33,7 +33,7 @@ class VariantRecordGwasFuns:
 
     @staticmethod
     def get_id(variant_record, trait):
-        return variant_record.samples[trait]['ID'][0]
+        return variant_record.samples[trait]['ID']
 
     @staticmethod
     def get_ss(variant_record, trait):

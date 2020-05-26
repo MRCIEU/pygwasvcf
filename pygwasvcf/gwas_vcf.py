@@ -149,7 +149,7 @@ class GwasVcf:
             pygwasvcf.VariantRecordGwasFuns.check_biallelic(rec)
 
             # skip variants not meeting filter requirements
-            if exclude_filtered and str(rec.filter) != "PASS":
+            if exclude_filtered and rec.filter.keys()[0] != "PASS":
                 continue
 
             # lazy return record
