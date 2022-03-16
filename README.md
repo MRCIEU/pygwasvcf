@@ -1,7 +1,8 @@
 # GWAS-VCF Python parser
 
 <!-- badges: start -->
-[![Build Status](https://travis-ci.org/MRCIEU/pygwasvcf.svg?branch=master)](https://travis-ci.org/MRCIEU/pygwasvcf)
+[![Build Status](https://github.com/MRCIEU/pygwasvcf/actions/workflows/test.yml/badge.svg)](https://github.com/MRCIEU/pygwasvcf/actions)
+[![DOI](https://img.shields.io/badge/doi-10.1186%2Fs13059--020--02248--0-blue)](https://doi.org/10.1186/s13059-020-02248-0)
 <!-- badges: end -->
 
 The package provides a thin wrapper around [pysam](https://pysam.readthedocs.io/en/latest/index.html) and [rsidx](https://github.com/bioforensics/rsidx) to parse VCF files containing GWAS summary statistics and trait metadata. See also [gwasvcf](https://github.com/MRCIEU/gwasvcf) an R package for parsing GWAS-VCF files.
