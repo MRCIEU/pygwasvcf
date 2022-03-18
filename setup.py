@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="pygwasvcf",
-    version="0.0.3",
+    version="0.0.4",
     author="Matt Lyon",
     author_email="ml18692@bristol.ac.uk",
     description="A package for reading GWAS summary statistics stored in VCF/BCF format",
