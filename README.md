@@ -12,7 +12,7 @@ Parses GWAS-VCF with version 1.0 of the [specification](https://github.com/MRCIE
 ## Install
 
 ```shell script
-pip install git+https://github.com/mrcieu/pygwasvcf
+pip install pygwasvcf
 ```
 
 ## Data
