@@ -91,6 +91,4 @@ API documentation available from <https://mrcieu.github.io/pygwasvcf>
 
 ## Citation
 
-```
 The variant call format provides efficient and robust storage of GWAS summary statistics. Lyon MS, Andrews SJ, Elsworth B, Gaunt TR, Hemani G, Marcora E. Genome Biol. 22, 32 (2021).
-```
